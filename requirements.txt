@@ -1,0 +1,10 @@
+fastapi
+uvicorn
+wikipedia
+feedparser
+requests
+beautifulsoup4
+sentence-transformers
+torch
+newspaper3k
+youtube-transcript-api
