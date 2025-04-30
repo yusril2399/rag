@@ -8,3 +8,4 @@ sentence-transformers
 torch
 newspaper3k
 youtube-transcript-api
+lxml-html-clean
