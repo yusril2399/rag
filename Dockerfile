@@ -9,4 +9,4 @@ RUN pip install -r requirements.txt
 
 EXPOSE ${PORT}
 
-CMD ["python", "context_api.py"]
+CMD ["sh", "-c", "uvicorn context_api:app --host 0.0.0.0 --port $PORT"]
