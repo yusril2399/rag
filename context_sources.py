@@ -132,14 +132,15 @@ def fetch_youtube_transcript(video_id):
 
 def fetch_rss_articles(feed_url, topic=None, max_articles=3):
     try:
-        import feedparser
-        import logging
         feed = feedparser.parse(feed_url)
         articles = []
+        logging.info(f"[RSS-FETCH] Feed URL: {feed_url} | Entries: {len(feed.entries)}")
         for entry in feed.entries:
             title = getattr(entry, "title", "No Title")
-            summary = getattr(entry, "summary", "") or getattr(entry, "description", "") or "No summary available"
+            summary = getattr(entry, "summary", "") or getattr(entry, "description", "") or "No summary"
             link = getattr(entry, "link", "")
+
+            logging.info(f"[RSS-ENTRY] Title: {title[:80]} | Link: {link}")
 
             articles.append({
                 "title": title,
@@ -148,11 +149,35 @@ def fetch_rss_articles(feed_url, topic=None, max_articles=3):
             })
             if len(articles) >= max_articles:
                 break
-        logging.info(f"[RSS] {len(articles)} articles fetched from feed: {feed_url}")
         return articles
+
     except Exception as e:
-        logging.warning(f"[RSS] Error fetching feed {feed_url}: {e}")
-        return [{"title": "RSS Error", "summary": str(e), "link": ""}]
+        logging.warning(f"[RSS-ERROR] Error fetching feed {feed_url}: {e}")
+        return [{"title": "RSS Error", "summary": str(e), "link": ""}]        
+
+# def fetch_rss_articles(feed_url, topic=None, max_articles=3):
+#     try:
+#         import feedparser
+#         import logging
+#         feed = feedparser.parse(feed_url)
+#         articles = []
+#         for entry in feed.entries:
+#             title = getattr(entry, "title", "No Title")
+#             summary = getattr(entry, "summary", "") or getattr(entry, "description", "") or "No summary available"
+#             link = getattr(entry, "link", "")
+
+#             articles.append({
+#                 "title": title,
+#                 "summary": summary.strip(),
+#                 "link": link
+#             })
+#             if len(articles) >= max_articles:
+#                 break
+#         logging.info(f"[RSS] {len(articles)} articles fetched from feed: {feed_url}")
+#         return articles
+#     except Exception as e:
+#         logging.warning(f"[RSS] Error fetching feed {feed_url}: {e}")
+#         return [{"title": "RSS Error", "summary": str(e), "link": ""}]
 
 def fetch_twitter_posts(bearer_token, query, max_results=10):
     url = "https://api.twitter.com/2/tweets/search/recent"
@@ -302,6 +327,10 @@ def fetch_context_sources_scored(
         wiki = future_wiki.result()
         search_results = future_search.result()
         rss_articles = future_rss.result()
+        logging.info(f"[DEBUG] Total RSS articles fetched: {len(rss_articles)}")
+        for art in rss_articles[:5]:  # log 5 pertama aja biar ga rame
+            logging.info(f"[DEBUG] RSS Title: {art['title']}")
+            logging.info(f"[DEBUG] RSS Summary (truncated): {art['summary'][:100]}")
 
     # === Wikipedia
     if is_valid_summary(wiki):
